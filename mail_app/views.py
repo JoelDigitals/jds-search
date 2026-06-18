@@ -1,8 +1,9 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
-from django.contrib import messages
-from django.core.mail import send_mail
-from django.conf import settings
+from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_exempt
+from django.contrib.auth.models import User
+from .models import Email, UserEmail
 from .models import Email
 
 
@@ -86,3 +87,23 @@ def mail_action(request, pk, action):
     if action == "star":
         return redirect(request.META.get("HTTP_REFERER", "/mail/"))
     return redirect("mail_home")
+
+
+@csrf_exempt
+def mail_webhook(request):
+    if request.method != "POST":
+        return JsonResponse({"error": "POST required"}, status=405)
+
+    sender = request.POST.get("from", "")
+    recipient = request.POST.get("to", "")
+    subject = request.POST.get("subject", "Kein Betreff")
+    body = request.POST.get("text", request.POST.get("body", ""))
+
+    if recipient.endswith("@jds-search.de"):
+        username = recipient.split("@")[0].lower()
+        user = User.objects.filter(username__iexact=username).first()
+        if user:
+            Email.objects.create(user=user, sender=sender, recipient=recipient, subject=subject, body=body, folder="inbox")
+            return JsonResponse({"status": "ok"})
+
+    return JsonResponse({"status": "ignored"})
