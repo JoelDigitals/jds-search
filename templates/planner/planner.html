@@ -1,0 +1,29 @@
+{% extends "base.html" %}{% block title %}JDS Planer – {{ month_name }} {{ year }}{% endblock %}{% block content %}
+<div class="ios-cal">
+    <div class="ios-cal-hdr">
+        <a href="?year={{ prev_year }}&month={{ prev_month }}" class="ios-btn ios-btn-sm"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg></a>
+        <h2>{{ month_name }} {{ year }}</h2>
+        <a href="?year={{ next_year }}&month={{ next_month }}" class="ios-btn ios-btn-sm"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg></a>
+        {% if user.is_authenticated %}<a href="{% url 'event_create' %}" class="ios-btn ios-btn-blue ios-btn-sm">+ Termin</a>{% endif %}
+    </div>
+
+    <div class="ios-cal-grid">
+        <div class="ios-cal-wdays"><span>Mo</span><span>Di</span><span>Mi</span><span>Do</span><span>Fr</span><span>Sa</span><span>So</span></div>
+        {% for week in weeks %}<div class="ios-cal-w">
+            {% for day_data in week %}{% if day_data %}
+            <div class="ios-cal-day {% if day_data.date == today %}t{% endif %}">
+                <span class="ios-cal-day-num">{{ day_data.day }}</span>
+                {% for event in day_data.events %}<div class="ios-cal-ev" style="background:{{ event.color }};">{{ event.title|truncatechars:10 }}</div>{% endfor %}
+            </div>{% else %}<div class="ios-cal-day e"></div>{% endif %}{% endfor %}
+        </div>{% endfor %}
+    </div>
+
+    <div style="margin-top:24px;">
+        <h3 style="font-size:17px;font-weight:600;margin-bottom:12px;">Anstehende Termine</h3>
+        {% for event in events %}<div class="ios-card" style="padding:14px;margin-bottom:8px;border-left:3px solid {{ event.color }};">
+            <div style="display:flex;justify-content:space-between;align-items:center;"><strong style="font-size:15px;">{{ event.title }}</strong><span style="color:var(--ios-text3);font-size:13px;">{{ event.start_time|date:"d.m.Y H:i" }}</span></div>
+            {% if event.description %}<div style="font-size:14px;color:var(--ios-text2);margin-top:4px;">{{ event.description|truncatechars:100 }}</div>{% endif %}
+            {% if event.location %}<div style="font-size:13px;color:var(--ios-text3);margin-top:2px;">{{ event.location }}</div>{% endif %}
+        </div>{% empty %}<div class="ios-empty" style="padding:40px;text-align:center;">Keine Termine in diesem Monat.</div>{% endfor %}
+    </div>
+</div>{% endblock %}

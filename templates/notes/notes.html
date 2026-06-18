@@ -1,0 +1,23 @@
+{% extends "base.html" %}{% block title %}Notizen – JDS{% endblock %}{% block content %}
+<div class="ios-section">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;"><h2>Notizen</h2><a href="{% url 'note_create' %}" class="ios-btn ios-btn-blue">+ Notiz</a></div>
+    <div class="ios-notes-grid">
+        {% for note in notes %}<div class="ios-note" style="{% if note.color and note.color != '#ffffff' %}background:{{ note.color }};border-color:transparent;{% endif %}">
+            <form method="POST" action="{% url 'note_update' note.pk %}" style="flex:1;display:flex;flex-direction:column;">
+                {% csrf_token %}<input type="hidden" name="color" value="{{ note.color }}">
+                <input type="text" name="title" value="{{ note.title }}" placeholder="Titel" style="border:none;background:transparent;font-size:15px;font-weight:600;margin-bottom:4px;font-family:var(--ios-font);width:100%;outline:none;" onchange="this.form.submit()">
+                <textarea name="content" placeholder="Notiz..." style="flex:1;border:none;background:transparent;font-size:14px;resize:none;font-family:var(--ios-font);min-height:70px;outline:none;" onchange="this.form.submit()">{{ note.content }}</textarea>
+            </form>
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-top:4px;font-size:11px;color:var(--ios-text3);">
+                <div style="display:flex;gap:6px;"><a href="{% url 'note_pin' note.pk %}" style="color:{% if note.is_pinned %}var(--ios-yellow){% else %}var(--ios-text3){% endif %};text-decoration:none;font-size:14px;" title="Anheften">&#9733;</a><span>{{ note.updated_at|date:"d.m." }}</span></div>
+                <div style="display:flex;gap:6px;">
+                    <select onchange="this.closest('.ios-note').querySelector('input[name=color]').value=this.value;this.closest('.ios-note').querySelector('form').submit();" style="border:none;background:transparent;font-size:12px;cursor:pointer;padding:0;font-family:var(--ios-font);">
+                        <option value="#ffffff">Weiss</option><option value="#ffcc00">Gelb</option><option value="#34c759">Grün</option><option value="#5ac8fa">Blau</option><option value="#af52de">Lila</option><option value="#ff9500">Orange</option><option value="#ff3b30">Rot</option>
+                    </select>
+                    <a href="{% url 'note_archive' note.pk %}" style="color:var(--ios-text3);text-decoration:none;">Archiv</a>
+                    <a href="{% url 'note_delete' note.pk %}" style="color:var(--ios-red);text-decoration:none;" onclick="return confirm('Loschen?')">Loschen</a>
+                </div>
+            </div>
+        </div>{% empty %}<div class="ios-empty"><p>Keine Notizen. Erstelle deine erste!</p></div>{% endfor %}
+    </div>
+</div>{% endblock %}

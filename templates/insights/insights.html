@@ -1,0 +1,30 @@
+{% extends "base.html" %}{% block title %}Analytics – JDS Insights{% endblock %}
+{% block extra_head %}<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>{% endblock %}
+{% block content %}
+<div class="section">
+    <h2>Analytics</h2>
+    <div class="stat-grid" style="margin-bottom:24px;">
+        <div class="stat-card"><div class="stat-val">{{ stats.pages }}</div><div class="stat-lbl">Indexierte Seiten</div></div>
+        <div class="stat-card"><div class="stat-val">{{ stats.searches_total }}</div><div class="stat-lbl">Suchanfragen</div></div>
+        <div class="stat-card"><div class="stat-val">{{ stats.mails }}</div><div class="stat-lbl">E-Mails</div></div>
+        <div class="stat-card"><div class="stat-val">{{ stats.products }}</div><div class="stat-lbl">Produkte</div></div>
+        <div class="stat-card"><div class="stat-val">{{ stats.chats }}</div><div class="stat-lbl">Chats</div></div>
+        <div class="stat-card"><div class="stat-val">{{ stats.searches_today }}</div><div class="stat-lbl">Suchen heute</div></div>
+    </div>
+
+    <div class="card" style="margin-bottom:20px;">
+        <div class="card-h">Kategorien</div>
+        <div style="display:flex;flex-wrap:wrap;gap:8px;">
+            {% for cat in stats.categories %}<span style="padding:4px 12px;background:var(--accent-l);color:var(--accent);border-radius:12px;font-size:12px;font-weight:600;">{{ cat.category }} ({{ cat.n }})</span>{% endfor %}
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-h">Suchanfragen (7 Tage)</div>
+        <canvas id="sc" height="200"></canvas>
+    </div>
+</div>
+<script>
+new Chart(document.getElementById('sc'),{type:'bar',data:{labels:[{% for l in chart_labels %}'{{ l }}'{% if not forloop.last %},{% endif %}{% endfor %}],datasets:[{data:[{% for d in chart_data %}{{ d }}{% if not forloop.last %},{% endif %}{% endfor %}],backgroundColor:'#4f46e5',borderRadius:4}]},options:{responsive:true,plugins:{legend:{display:false}},scales:{y:{beginAtZero:true,grid:{color:'rgba(0,0,0,0.06)'}},x:{grid:{display:false}}}}});
+</script>
+{% endblock %}

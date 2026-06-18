@@ -1,0 +1,28 @@
+{% extends "base.html" %}{% block title %}Guthaben – JDS{% endblock %}{% block content %}
+<div class="ios-section" style="max-width:560px;"><h2>Guthaben aufladen</h2>
+<div class="ios-card" style="margin-bottom:16px;text-align:center;"><div style="font-size:13px;color:var(--ios-text3);margin-bottom:4px;">Aktuelles Guthaben</div><div style="font-size:56px;font-weight:700;color:var(--ios-green);">{{ wallet.balance }} &euro;</div></div>
+{% if success %}<div style="background:rgba(52,199,89,0.1);color:var(--ios-green);padding:12px;border-radius:10px;margin-bottom:12px;font-size:14px;">{{ success }}</div>{% endif %}
+{% if error %}<div style="background:rgba(255,59,48,0.08);color:var(--ios-red);padding:10px;border-radius:10px;margin-bottom:12px;font-size:13px;">{{ error }}</div>{% endif %}
+
+<div class="ios-card" style="margin-bottom:14px;"><div class="ios-card-h">Schnellaufladung</div>
+<form method="POST">{% csrf_token %}<div class="ios-input-group"><label>Betrag (&euro;)</label><input type="number" name="amount" class="ios-input" value="50" min="10" max="50000" step="1" required></div>
+<button type="submit" class="ios-submit" style="width:auto;padding:12px 32px;">Jetzt aufladen</button></form></div>
+
+<div class="ios-card"><div class="ios-card-h">Stripe Checkout</div><p style="font-size:14px;color:var(--ios-text2);margin-bottom:12px;">Sichere Zahlung per Kreditkarte, Apple Pay, Google Pay.</p>
+<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:16px;">
+<button onclick="stripePay(25)" class="ios-btn" style="padding:14px;font-size:15px;font-weight:600;">25 &euro;</button>
+<button onclick="stripePay(50)" class="ios-btn ios-btn-blue" style="padding:14px;font-size:15px;font-weight:600;">50 &euro;</button>
+<button onclick="stripePay(100)" class="ios-btn" style="padding:14px;font-size:15px;font-weight:600;">100 &euro;</button>
+</div>
+<p id="stripeStatus" style="font-size:13px;color:var(--ios-text3);"></p></div>
+<script>
+function stripePay(amount){
+    document.getElementById('stripeStatus').textContent='Verarbeite Zahlung...';
+    document.getElementById('stripeStatus').style.color='var(--ios-blue)';
+    var fd=new FormData();fd.append('amount',amount);fd.append('csrfmiddlewaretoken','{{ csrf_token }}');
+    fetch('/search/wallet/stripe/',{method:'POST',body:fd}).then(r=>r.json()).then(d=>{
+        if(d.success){document.getElementById('stripeStatus').textContent=amount+' EUR aufgeladen! Guthaben: '+d.balance+' EUR';document.getElementById('stripeStatus').style.color='var(--ios-green)';setTimeout(function(){location.reload()},1500)}
+    }).catch(function(){document.getElementById('stripeStatus').textContent='Fehler. Bitte erneut versuchen.';document.getElementById('stripeStatus').style.color='var(--ios-red)'});
+}
+</script>
+</div>{% endblock %}

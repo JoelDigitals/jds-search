@@ -1,0 +1,56 @@
+<!DOCTYPE html><html lang="de" data-theme="light"><head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0,viewport-fit=cover">
+<meta name="theme-color" content="#f2f2f7"><meta name="description" content="JDS Search">
+<link rel="manifest" href="/static/manifest.json"><link rel="apple-touch-icon" href="/static/icon-192.png">
+<title>{% block title %}JDS{% endblock %}</title>
+{% load static %}<link rel="stylesheet" href="{% static 'css/style.css' %}">
+{% block extra_head %}{% endblock %}
+</head><body>
+<header class="ios-topbar">
+{% if user.is_authenticated %}
+<div class="ios-topbar-left">
+<a href="{% url 'landing' %}" class="ios-logo"><span>J</span>DS</a>
+<a href="{% url 'mail_home' %}" style="font-size:14px;color:var(--ios-text2);">Mail</a>
+<a href="{% url 'planner_home' %}" style="font-size:14px;color:var(--ios-text2);">Planer</a>
+<a href="{% url 'marketplace_home' %}" style="font-size:14px;color:var(--ios-text2);">Markt</a>
+<a href="/search/ads/" style="font-size:14px;color:var(--ios-text2);">Ads</a>
+</div>{% endif %}
+<div style="position:relative;">
+<button class="ios-btn-apps" onclick="document.getElementById('ad').classList.toggle('show')">
+<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="5" cy="5" r="2"/><circle cx="12" cy="5" r="2"/><circle cx="19" cy="5" r="2"/><circle cx="5" cy="12" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="19" cy="12" r="2"/><circle cx="5" cy="19" r="2"/><circle cx="12" cy="19" r="2"/><circle cx="19" cy="19" r="2"/></svg>
+</button>
+<div class="ios-apps-drop" id="ad">
+<a href="{% url 'search_home' %}" class="ios-app-item"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>Search</a>
+<a href="{% url 'jdai_home' %}" class="ios-app-item"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="3"/><line x1="9" y1="9" x2="15" y2="15"/><line x1="15" y1="9" x2="9" y2="15"/></svg>JDAI</a>
+<a href="{% url 'mail_home' %}" class="ios-app-item"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M22 4L12 13 2 4"/></svg>Mail</a>
+<a href="{% url 'planner_home' %}" class="ios-app-item"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>Planer</a>
+<a href="{% url 'marketplace_home' %}" class="ios-app-item"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 002 1.61h9.72a2 2 0 002-1.61L23 6H6"/></svg>Markt</a>
+<a href="{% url 'insights_home' %}" class="ios-app-item"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>Insights</a>
+<a href="{% url 'present_home' %}" class="ios-app-item"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v16"/></svg>Present</a>
+<a href="{% url 'notes_home' %}" class="ios-app-item"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>Notizen</a>
+<a href="/search/ads/" class="ios-app-item"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="5"/><line x1="8" y1="12" x2="16" y2="12"/></svg>Ads</a>
+<a href="{% url 'developer' %}" class="ios-app-item"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>Dev</a>
+</div></div>
+<button onclick="toggleTheme()" class="ios-btn-apps" title="Hell/Dunkel" style="margin-left:4px;"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg></button>
+{% if user.is_authenticated %}
+<div style="position:relative;">
+<div class="ios-avatar" onclick="document.getElementById('profDrop').classList.toggle('show')" style="cursor:pointer;">{{ user.username|slice:":1"|upper }}</div>
+<div class="ios-prof-drop" id="profDrop">
+    <div style="padding:14px 16px;border-bottom:1px solid var(--ios-border);"><strong>{{ user.username }}</strong><div style="font-size:12px;color:var(--ios-text3);">{{ user.email }}</div></div>
+    <a href="{% url 'profile' %}" style="display:flex;align-items:center;gap:10px;padding:12px 16px;font-size:14px;color:var(--ios-text);text-decoration:none;"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>Profil & Einstellungen</a>
+    <a href="{% url 'developer' %}" style="display:flex;align-items:center;gap:10px;padding:12px 16px;font-size:14px;color:var(--ios-text);text-decoration:none;"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>Developer</a>
+    <a href="{% url 'privacy' %}" style="display:flex;align-items:center;gap:10px;padding:12px 16px;font-size:14px;color:var(--ios-text);text-decoration:none;"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>Datenschutz</a>
+    <div style="border-top:1px solid var(--ios-border);"><a href="{% url 'logout' %}" style="display:flex;align-items:center;gap:10px;padding:12px 16px;font-size:14px;color:var(--ios-red);text-decoration:none;"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>Abmelden</a></div>
+</div></div>
+{% else %}<a href="{% url 'login' %}" class="ios-signin">Anmelden</a>{% endif %}
+</header>
+{% block content %}{% endblock %}
+<div class="ios-cookie" id="cbar" style="display:none"><span>JDS verwendet nur technisch notwendige Cookies.</span><a href="{% url 'privacy' %}" style="font-size:13px;">Datenschutz</a><button onclick="document.getElementById('cbar').style.display='none';localStorage.setItem('jds-ck','1');" class="ios-btn ios-btn-blue ios-btn-sm">OK</button></div>
+<script>
+var theme=localStorage.getItem('jds-theme')||'light';document.documentElement.setAttribute('data-theme',theme);
+function toggleTheme(){var n=document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark';document.documentElement.setAttribute('data-theme',n);localStorage.setItem('jds-theme',n)}
+if(!localStorage.getItem('jds-ck'))document.getElementById('cbar').style.display='flex';
+document.addEventListener('click',function(e){var d=document.getElementById('ad');if(d&&!e.target.closest('.ios-btn-apps'))d.classList.remove('show');var p=document.getElementById('profDrop');if(p&&!e.target.closest('.ios-avatar'))p.classList.remove('show')});
+if('serviceWorker' in navigator)navigator.serviceWorker.register('/static/sw.js');
+</script>{% block extra_js %}{% endblock %}
+</body></html>

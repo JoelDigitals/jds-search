@@ -1,0 +1,7 @@
+{% extends "base.html" %}{% block title %}Suchverlauf – JDS{% endblock %}{% block content %}
+<div class="ios-section" style="max-width:700px;"><h2>Suchverlauf</h2>
+{% for item in history %}<div style="display:flex;justify-content:space-between;align-items:center;padding:12px 0;border-bottom:1px solid var(--ios-border2);">
+    <div><a href="{% url 'search_home' %}?q={{ item.query|urlencode }}" style="font-size:15px;color:var(--ios-blue);">{{ item.query }}</a><span style="color:var(--ios-text3);font-size:12px;margin-left:10px;">{{ item.results_count }} Ergebnisse &middot; {{ item.searched_at|date:"d.m.y H:i" }}</span></div>
+    <a href="{% url 'history_delete' item.pk %}" class="ios-btn ios-btn-red ios-btn-sm" onclick="return confirm('Loschen?')">Loschen</a>
+</div>{% empty %}<div class="ios-empty">Kein Suchverlauf.</div>{% endfor %}
+</div>{% endblock %}

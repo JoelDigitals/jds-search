@@ -1,0 +1,10 @@
+{% extends "base.html" %}{% block title %}Business Profile – JDS Present{% endblock %}{% block content %}
+<div class="ios-section" style="max-width:900px;">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;"><h2>Business Profile</h2>{% if user.is_authenticated %}<a href="{% url 'my_profile' %}" class="ios-btn ios-btn-blue">Mein Profil</a>{% endif %}</div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:14px;">
+        {% for profile in profiles %}<a href="{% url 'present_profile' profile.user.username %}" class="ios-card" style="display:flex;gap:14px;align-items:center;text-decoration:none;color:var(--ios-text);padding:18px;">
+            <div style="width:56px;height:56px;border-radius:var(--ios-radius-sm);background:var(--ios-bg);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:24px;">{% if profile.logo_url %}<img src="{{ profile.logo_url }}" style="width:100%;height:100%;object-fit:cover;border-radius:var(--ios-radius-sm);">{% else %}<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="var(--ios-text3)" stroke-width="1.5"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v16"/></svg>{% endif %}</div>
+            <div style="flex:1;"><div style="font-size:15px;font-weight:600;">{{ profile.business_name }}</div><div style="font-size:13px;color:var(--ios-text3);">{{ profile.slogan|truncatechars:60 }}</div></div>
+        </a>{% empty %}<div class="ios-empty" style="grid-column:1/-1;"><p>Keine Profile veroffentlicht.</p></div>{% endfor %}
+    </div>
+</div>{% endblock %}

@@ -1,0 +1,45 @@
+{% extends "base.html" %}{% block title %}{{ profile.business_name }} – JDS Present{% endblock %}{% block content %}
+<div class="ios-section" style="max-width:900px;">
+<a href="{% url 'present_home' %}" class="ios-btn ios-btn-sm" style="margin-bottom:16px;">Zuruck</a>
+<div class="ios-card" style="margin-bottom:14px;display:flex;gap:20px;align-items:center;padding:24px;">
+<div style="width:72px;height:72px;border-radius:var(--ios-radius);background:var(--ios-bg);display:flex;align-items:center;justify-content:center;flex-shrink:0;overflow:hidden;">{% if profile.logo_url %}<img src="{{ profile.logo_url }}" style="width:100%;height:100%;object-fit:cover;">{% else %}<span style="font-size:32px;font-weight:700;color:var(--ios-text3);">{{ profile.business_name|slice:':1' }}</span>{% endif %}</div>
+<div style="flex:1;"><h1 style="font-size:26px;font-weight:700;">{{ profile.business_name }}</h1><p style="color:var(--ios-text3);margin-top:2px;">{{ profile.slogan }}</p>
+<div style="display:flex;align-items:center;gap:12px;margin-top:8px;flex-wrap:wrap;">
+{% if profile.average_rating > 0 %}<span style="color:var(--ios-yellow);font-size:16px;">{% for i in "12345" %}{% if forloop.counter <= profile.average_rating %}★{% else %}☆{% endif %}{% endfor %}</span><span style="font-size:14px;color:var(--ios-text2);">{{ profile.average_rating }} ({{ profile.review_count }})</span>{% else %}<span style="font-size:13px;color:var(--ios-text3);">Noch keine Bewertungen</span>{% endif %}
+{% if profile.is_open_now %}<span class="ios-badge" style="background:rgba(52,199,89,0.1);color:var(--ios-green);">Jetzt geoffnet</span>{% elif profile.is_open_now == False %}<span class="ios-badge" style="background:rgba(255,59,48,0.08);color:var(--ios-red);">Geschlossen</span>{% endif %}
+</div>
+{% if tag_list %}<div style="display:flex;gap:4px;flex-wrap:wrap;margin-top:8px;">{% for tag in tag_list %}<span style="padding:2px 8px;background:var(--ios-bg);border-radius:var(--ios-radius-pill);font-size:11px;color:var(--ios-text3);">{{ tag }}</span>{% endfor %}</div>{% endif %}
+</div></div>
+
+<div style="display:flex;gap:16px;"><div style="flex:1;">
+{% if profile.description %}<div class="ios-card" style="margin-bottom:12px;"><div class="ios-card-h">Uber uns</div><p style="font-size:15px;line-height:1.6;color:var(--ios-text2);">{{ profile.description|linebreaksbr }}</p></div>{% endif %}
+
+{% if profile.latitude and profile.longitude %}<div class="ios-card" style="margin-bottom:12px;padding:0;overflow:hidden;"><div id="bpMap" style="height:280px;"></div></div>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/><script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>var m=L.map('bpMap').setView([{{ profile.latitude }},{{ profile.longitude }}],14);L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{attribution:'&copy; OpenStreetMap',maxZoom:19}).addTo(m);L.marker([{{ profile.latitude }},{{ profile.longitude }}]).addTo(m).bindPopup('<strong>{{ profile.business_name|escapejs }}</strong>')</script>{% endif %}
+</div>
+
+<div style="width:280px;flex-shrink:0;">
+{% if profile.opening_hours %}<div class="ios-card" style="margin-bottom:12px;padding:16px;"><div class="ios-card-h">Offnungszeiten</div><pre style="font-size:13px;color:var(--ios-text2);font-family:var(--ios-font);line-height:1.8;white-space:pre-wrap;">{{ profile.opening_hours }}</pre>{% if profile.special_hours %}<div style="margin-top:10px;font-size:11px;color:var(--ios-text3);font-weight:600;">Sonderzeiten</div><pre style="font-size:12px;color:var(--ios-text3);font-family:var(--ios-font);line-height:1.6;white-space:pre-wrap;">{{ profile.special_hours }}</pre>{% endif %}</div>{% endif %}
+
+<div class="ios-card" style="margin-bottom:12px;padding:16px;"><div class="ios-card-h">Kontakt</div>
+{% if profile.website %}<p style="font-size:13px;margin-bottom:6px;"><a href="{{ profile.website }}" target="_blank">{{ profile.website }}</a></p>{% endif %}
+{% if profile.email %}<p style="font-size:13px;margin-bottom:6px;">{{ profile.email }}</p>{% endif %}
+{% if profile.phone %}<p style="font-size:13px;margin-bottom:6px;">{{ profile.phone }}</p>{% endif %}
+{% if profile.address %}<p style="font-size:13px;margin-bottom:6px;">{{ profile.address }}</p>{% endif %}
+{% if profile.service_area %}<p style="font-size:12px;color:var(--ios-text3);margin-top:4px;">Einzugsgebiet: {{ profile.service_area }}</p>{% endif %}
+{% if profile.inquiry_url %}<a href="{{ profile.inquiry_url }}" target="_blank" class="ios-btn ios-btn-blue" style="margin-top:8px;display:block;text-align:center;">Anfrage senden</a>{% endif %}
+</div>
+
+{% if profile.category %}<div class="ios-card" style="margin-bottom:12px;padding:16px;"><div class="ios-card-h">Info</div><p style="font-size:13px;">Kategorie: <strong>{{ profile.category }}</strong></p></div>{% endif %}
+</div></div></div>
+
+<div class="ios-section" style="max-width:900px;margin-top:0;"><div class="ios-card"><div class="ios-card-h">Bewertungen ({{ reviews|length }})</div>
+{% for r in reviews %}<div style="padding:12px 0;border-bottom:1px solid var(--ios-border2);"><div style="display:flex;align-items:center;gap:8px;"><strong>{{ r.author.username }}</strong><span style="color:var(--ios-yellow);">{% for i in "12345" %}{% if forloop.counter <= r.rating %}★{% else %}☆{% endif %}{% endfor %}</span><span style="font-size:12px;color:var(--ios-text3);">{{ r.created_at|date:"d.m.Y" }}</span></div>{% if r.comment %}<p style="font-size:14px;color:var(--ios-text2);margin-top:4px;">{{ r.comment }}</p>{% endif %}</div>{% empty %}<p style="font-size:14px;color:var(--ios-text3);">Noch keine Bewertungen.</p>{% endfor %}
+
+{% if user.is_authenticated %}<form method="POST" style="margin-top:16px;border-top:1px solid var(--ios-border2);padding-top:14px;">{% csrf_token %}
+<div class="ios-input-group"><label>Deine Bewertung</label><div style="display:flex;gap:4px;margin-bottom:8px;" id="starSelect">{% for i in "12345" %}<span style="font-size:28px;cursor:pointer;color:var(--ios-border);" onclick="setStars({{ forloop.counter }})" data-star="{{ forloop.counter }}">★</span>{% endfor %}</div><input type="hidden" name="rating" id="ratingVal" value="0"></div>
+<div class="ios-input-group"><textarea name="comment" class="ios-input" rows="3" placeholder="Dein Kommentar..." required></textarea></div>
+<button type="submit" class="ios-btn ios-btn-blue">Bewertung abgeben</button></form>
+<script>function setStars(n){document.getElementById('ratingVal').value=n;document.querySelectorAll('#starSelect span').forEach(function(s,i){s.style.color=i<n?'var(--ios-yellow)':'var(--ios-border)'})}</script>{% endif %}
+</div></div>{% endblock %}

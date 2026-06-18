@@ -1,0 +1,36 @@
+{% extends "base.html" %}{% block title %}Profil – JDS{% endblock %}{% block content %}
+<div class="ios-section" style="max-width:680px;">
+    <div style="display:flex;align-items:center;gap:20px;margin-bottom:28px;">
+        <div class="ios-avatar" style="width:64px;height:64px;font-size:28px;">{{ user.username|slice:":1"|upper }}</div>
+        <div><h2 style="margin:0;">{{ user.username }}</h2><p style="color:var(--ios-text3);margin-top:2px;">{{ user.email }}</p></div>
+    </div>
+
+    <div class="ios-card" style="margin-bottom:16px;"><div class="ios-card-h">Konto-Einstellungen</div>
+        <form method="POST">{% csrf_token %}
+        <div class="ios-input-group"><label>E-Mail-Adresse</label><input type="email" name="email" class="ios-input" value="{{ user.email }}" placeholder="{{ user.username }}@jds-search.de"></div>
+        <div class="ios-input-group"><label>Neues Passwort</label><input type="password" name="password" class="ios-input" placeholder="Leer lassen zum Behalten"></div>
+        <button type="submit" class="ios-btn ios-btn-blue">Speichern</button></form>
+    </div>
+
+    <div class="ios-card" style="margin-bottom:16px;"><div class="ios-card-h">API-Keys</div>
+        <p style="font-size:14px;color:var(--ios-text2);margin-bottom:12px;">Verwende diese Keys fur die REST-API mit <code style="background:var(--ios-bg);padding:2px 6px;border-radius:4px;">Authorization: Bearer KEY</code></p>
+        {% for key in api_keys %}
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--ios-border2);">
+            <div><strong style="font-size:14px;">{{ key.name }}</strong><div style="font-size:12px;color:var(--ios-text3);">{{ key.prefix }}... &middot; {{ key.request_count }} Requests &middot; {% if key.last_used %}Zuletzt {{ key.last_used|date:"d.m.Y H:i" }}{% else %}Nie{% endif %}</div></div>
+            <span class="ios-badge">Aktiv</span>
+        </div>{% empty %}
+        <div style="font-size:14px;color:var(--ios-text3);padding:8px 0;">Admin -> API Keys, um Keys zu generieren.</div>{% endfor %}
+    </div>
+
+    <div class="ios-card" style="margin-bottom:16px;"><div class="ios-card-h">Statistiken</div>
+        <div style="display:flex;gap:20px;flex-wrap:wrap;">
+            <div><span style="font-size:24px;font-weight:700;color:var(--ios-blue);">{{ search_count }}</span><div style="font-size:12px;color:var(--ios-text3);">Suchanfragen</div></div>
+            <div><span style="font-size:24px;font-weight:700;color:var(--ios-green);">{{ mail_count }}</span><div style="font-size:12px;color:var(--ios-text3);">E-Mails</div></div>
+            <div><span style="font-size:24px;font-weight:700;color:var(--ios-orange);">{{ event_count }}</span><div style="font-size:12px;color:var(--ios-text3);">Termine</div></div>
+            <div><span style="font-size:24px;font-weight:700;color:var(--ios-purple);">{{ chat_count }}</span><div style="font-size:12px;color:var(--ios-text3);">Chats</div></div>
+        </div>
+    </div>
+
+    <a href="{% url 'developer' %}" class="ios-btn" style="margin-right:8px;">Developer Settings</a>
+    <a href="{% url 'logout' %}" class="ios-btn ios-btn-red">Abmelden</a>
+</div>{% endblock %}

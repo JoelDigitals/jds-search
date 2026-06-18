@@ -1,0 +1,95 @@
+{% extends "base.html" %}{% block title %}DNS Setup – JDS{% endblock %}{% block content %}
+<div class="ios-section" style="max-width:760px;">
+    <h2>DNS-Einrichtung – Einmalig, fur alle</h2>
+    <p style="color:var(--ios-text2);font-size:14px;margin-bottom:28px;">Nach dieser Einrichtung funktioniert JDS Mail fur <strong>alle Nutzer</strong> – egal ob joel@, info@, support@jds-search.de.</p>
+
+    <div class="ios-card" style="margin-bottom:18px;">
+        <div class="ios-card-h">Schritt 1: Server-IP herausfinden</div>
+        <p style="font-size:14px;color:var(--ios-text2);margin-bottom:10px;">Dein Server ist der Rechner, auf dem JDS lauft (VPS, Root-Server, Hetzner, Netcup, Contabo...).</p>
+        <div style="background:var(--ios-bg);padding:14px;border-radius:8px;margin-bottom:8px;">
+            <div style="font-size:12px;color:var(--ios-text3);font-weight:600;margin-bottom:4px;">Methode 1: Beim Hoster nachschauen</div>
+            <div style="font-size:14px;">Logge dich bei deinem Hoster ein. Die IP steht direkt im Dashboard neben deinem Server. Z.B. <code>49.12.34.56</code></div>
+        </div>
+        <div style="background:var(--ios-bg);padding:14px;border-radius:8px;margin-bottom:8px;">
+            <div style="font-size:12px;color:var(--ios-text3);font-weight:600;margin-bottom:4px;">Methode 2: Per SSH-Befehl</div>
+            <code style="font-size:14px;">curl -4 ifconfig.me</code>
+            <div style="font-size:13px;color:var(--ios-text3);margin-top:4px;">Gibt direkt deine öffentliche IPv4 aus, z.B. <code>49.12.34.56</code></div>
+        </div>
+        <div style="background:var(--ios-bg);padding:14px;border-radius:8px;">
+            <div style="font-size:12px;color:var(--ios-text3);font-weight:600;margin-bottom:4px;">Methode 3: Lokale Entwicklung</div>
+            <div style="font-size:13px;color:var(--ios-text3);">Fur lokale Tests brauchst du <strong>keine</strong> DNS-Eintrage. Mail funktioniert intern per <code>check_mail</code>-Befehl. Siehe Schritt 4.</div>
+        </div>
+    </div>
+
+    <div class="ios-card" style="margin-bottom:18px;">
+        <div class="ios-card-h">Schritt 2: DNS-Eintrage setzen (2 Stuck)</div>
+        <p style="font-size:13px;color:var(--ios-text3);margin-bottom:14px;">Bei deinem Domain-Provider (Cloudflare, Ionos, Strato, Hetzner DNS-Console)</p>
+
+        <table class="ios-table" style="margin-bottom:12px;">
+            <tr><th colspan="2" style="font-size:13px;">Eintrag 1 – Mails empfangen</th></tr>
+            <tr><td style="font-weight:600;">Typ</td><td><code>MX</code></td></tr>
+            <tr><td style="font-weight:600;">Host / Name</td><td><code>@</code> (oder leer lassen)</td></tr>
+            <tr><td style="font-weight:600;">Wert / Ziel</td><td><code>mail.jds-search.de</code></td></tr>
+            <tr><td style="font-weight:600;">Prioritat</td><td><code>10</code></td></tr>
+        </table>
+
+        <table class="ios-table">
+            <tr><th colspan="2" style="font-size:13px;">Eintrag 2 – Mail-Server erreichbar machen</th></tr>
+            <tr><td style="font-weight:600;">Typ</td><td><code>A</code></td></tr>
+            <tr><td style="font-weight:600;">Host / Name</td><td><code>mail</code></td></tr>
+            <tr><td style="font-weight:600;">Wert / Ziel</td><td><code>DEINE.SERVER.IP</code> (aus Schritt 1)</td></tr>
+        </table>
+
+        <p style="font-size:12px;color:var(--ios-text3);margin-top:10px;">Optional fur Spam-Schutz:</p>
+        <table class="ios-table" style="margin-top:6px;">
+            <tr><th colspan="2" style="font-size:13px;">Eintrag 3 (optional) – Spam vermeiden</th></tr>
+            <tr><td style="font-weight:600;">Typ</td><td><code>TXT</code></td></tr>
+            <tr><td style="font-weight:600;">Host / Name</td><td><code>@</code></td></tr>
+            <tr><td style="font-weight:600;">Wert</td><td style="font-size:12px;"><code>v=spf1 mx a ~all</code></td></tr>
+        </table>
+    </div>
+
+    <div class="ios-card" style="margin-bottom:18px;">
+        <div class="ios-card-h">Schritt 3: Catch-All-Weiterleitung einrichten</div>
+        <p style="font-size:14px;color:var(--ios-text2);margin-bottom:10px;">Damit ALLE @jds-search.de-Adressen automatisch ankommen:</p>
+        <div style="background:var(--ios-bg);padding:14px;border-radius:8px;">
+            <div style="font-size:13px;color:var(--ios-text3);margin-bottom:6px;">Bei deinem Domain-Provider / E-Mail-Provider:</div>
+            <div style="font-size:14px;line-height:1.8;">
+                <strong>Catch-All</strong> aktivieren:<br>
+                Alle E-Mails an <code>*@jds-search.de</code><br>
+                weiterleiten an <code>catchall-jds@gmail.com</code>
+            </div>
+        </div>
+    </div>
+
+    <div class="ios-card" style="margin-bottom:18px;">
+        <div class="ios-card-h">Schritt 4: JDS Mail-Poller starten (ein Befehl)</div>
+        <p style="font-size:14px;color:var(--ios-text2);margin-bottom:10px;">Diese eine Zeile holt alle Mails ab und verteilt sie automatisch an die richtigen JDS-Nutzer:</p>
+        <div style="background:var(--ios-bg);padding:14px;border-radius:8px;margin-bottom:10px;">
+            <code style="font-size:14px;">python manage.py check_mail --user catchall-jds@gmail.com --password DEIN_APP_PASSWORT</code>
+        </div>
+        <div style="background:rgba(0,122,255,0.05);padding:12px;border-radius:8px;">
+            <div style="font-size:12px;color:var(--ios-text3);font-weight:600;margin-bottom:4px;">Wie es funktioniert:</div>
+            <div style="font-size:13px;color:var(--ios-text2);line-height:1.6;">
+                1. GMX schickt Mail an <strong>joel@jds-search.de</strong><br>
+                2. Catch-All leitet sie an <strong>catchall-jds@gmail.com</strong><br>
+                3. Der Poller holt sie per IMAP ab<br>
+                4. Erkennt <strong>joel@</strong> → sucht Nutzer <strong>joel</strong><br>
+                5. Mail erscheint in Joels JDS-Posteingang<br><br>
+                <strong>Fertig.</strong> Funktioniert fur alle Nutzer. Einmal einrichten.
+            </div>
+        </div>
+    </div>
+
+    <div class="ios-card">
+        <div class="ios-card-h">Gmail App-Passwort erstellen</div>
+        <div style="font-size:13px;color:var(--ios-text2);line-height:1.6;">
+            1. <a href="https://myaccount.google.com/security" target="_blank">Google Sicherheitseinstellungen</a><br>
+            2. "2-Faktor-Authentifizierung" aktivieren<br>
+            3. Danach: "App-Passworter" → Neues Passwort<br>
+            4. Name: "JDS Mail" → 16-stelliges Passwort kopieren<br>
+            5. In den Befehl oben einfugen<br><br>
+            <strong>Das war's.</strong> Jetzt kann jeder eine @jds-search.de-Adresse nutzen. JDS Mail ist bereit.
+        </div>
+    </div>
+</div>{% endblock %}

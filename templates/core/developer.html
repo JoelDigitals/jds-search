@@ -1,0 +1,16 @@
+{% extends "base.html" %}{% block title %}Developer – JDS{% endblock %}{% block content %}
+<div class="ios-section" style="max-width:720px;">
+    <h2>Developer Settings</h2>
+    {% if new_key %}<div class="ios-card" style="margin-bottom:16px;background:rgba(52,199,89,0.06);border-color:var(--ios-green);"><div style="font-size:14px;font-weight:600;color:var(--ios-green);margin-bottom:8px;">Neuer API-Key erstellt</div><div style="background:var(--ios-bg);padding:12px;border-radius:8px;font-family:monospace;font-size:13px;word-break:break-all;">{{ new_key }}</div><p style="font-size:12px;color:var(--ios-red);margin-top:8px;">Kopiere diesen Key jetzt. Er wird nie wieder angezeigt.</p></div>{% endif %}
+    <div class="ios-card" style="margin-bottom:16px;"><div class="ios-card-h">API-Keys</div>
+    <form method="POST" style="display:flex;gap:8px;margin-bottom:12px;">{% csrf_token %}<input type="hidden" name="action" value="create_key"><input type="text" name="key_name" class="ios-input" placeholder="Key-Name" style="flex:1;" required><button type="submit" class="ios-btn ios-btn-blue">Key erstellen</button></form>
+    {% for key in api_keys %}<div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--ios-border2);"><div><strong>{{ key.name }}</strong><div style="font-size:12px;color:var(--ios-text3);">{{ key.prefix }}... &middot; {{ key.request_count }} Requests</div></div><span class="ios-badge">Aktiv</span></div>{% empty %}<div style="font-size:14px;color:var(--ios-text3);">Keine API-Keys.</div>{% endfor %}</div>
+    <div class="ios-card" style="margin-bottom:16px;"><div class="ios-card-h">API-Endpunkte</div><p style="font-size:14px;color:var(--ios-text2);line-height:1.6;">
+        <code>GET /api/v1/search/?q=...</code> – Suche<br>
+        <code>GET /api/v1/mail/inbox/</code> – Posteingang<br>
+        <code>POST /api/v1/mail/send/</code> – Mail senden<br>
+        <code>GET /api/v1/calendar/events/</code> – Termine<br>
+        <code>GET /api/v1/user/profile/</code> – Profil
+    </p></div>
+    <div class="ios-card"><div class="ios-card-h">SSO / OAuth</div><p style="font-size:14px;color:var(--ios-text2);line-height:1.6;">Single Sign-On uber alle JDS-Subdomains. Session-Cookie wird auf <code>.jds-search.de</code> gesetzt. Alle Apps teilen denselben Login.</p></div>
+</div>{% endblock %}

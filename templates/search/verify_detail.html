@@ -1,0 +1,43 @@
+{% extends "base.html" %}{% block title %}Verifikation: {{ verification.domain }} – JDS{% endblock %}
+{% block content %}
+<div class="section" style="max-width:700px;">
+    <h2>Verifikation: {{ verification.domain }}</h2>
+    <div style="color:{% if verification.status == 'verified' %}var(--green){% else %}var(--orange){% endif %};font-size:14px;margin-bottom:20px;">
+        Status: {% if verification.status == 'verified' %}✓ Verifiziert am {{ verification.verified_at|date:"d.m.Y H:i" }}{% else %}⏳ Ausstehend{% endif %}
+        {% if check_result %}<span style="color:var(--green);"> – Erfolgreich geprüft!</span>{% elif check_result is False %}<span style="color:var(--red);"> – Noch nicht bestätigt</span>{% endif %}
+    </div>
+
+    {% if verification.method == 'dns' %}
+    <div class="card" style="margin-bottom:12px;">
+        <div class="card-h">Schritt 2: DNS TXT Record setzen</div>
+        <p style="font-size:14px;color:var(--fg2);margin-bottom:12px;">Füge diesen TXT-Record bei deinem Domain-Provider hinzu:</p>
+        <table style="width:100%;font-size:14px;border-collapse:collapse;">
+            <tr style="border-bottom:1px solid var(--border);"><td style="padding:8px 12px;font-weight:600;color:var(--fg2);width:120px;">Typ</td><td style="font-family:monospace;">TXT</td></tr>
+            <tr style="border-bottom:1px solid var(--border);"><td style="padding:8px 12px;font-weight:600;color:var(--fg2);">Host</td><td style="font-family:monospace;">@</td></tr>
+            <tr><td style="padding:8px 12px;font-weight:600;color:var(--fg2);">Wert</td><td style="font-family:monospace;word-break:break-all;font-size:13px;">{{ verification.dns_record }}</td></tr>
+        </table>
+    </div>
+    {% elif verification.method == 'meta' %}
+    <div class="card" style="margin-bottom:12px;">
+        <div class="card-h">Schritt 2: Meta-Tag einfügen</div>
+        <p style="font-size:14px;color:var(--fg2);margin-bottom:12px;">Füge diesen Tag in den &lt;head&gt; deiner Startseite ein:</p>
+        <pre style="background:var(--bg2);padding:16px;border-radius:6px;overflow-x:auto;font-size:13px;">{{ verification.meta_tag }}</pre>
+    </div>
+    {% else %}
+    <div class="card" style="margin-bottom:12px;">
+        <div class="card-h">Schritt 2: HTML-Datei hochladen</div>
+        <p style="font-size:14px;color:var(--fg2);margin-bottom:12px;">Lade diese Datei ins Wurzelverzeichnis deiner Domain:</p>
+        <pre style="background:var(--bg2);padding:16px;border-radius:6px;font-size:13px;">Dateiname: {{ verification.file_name }}
+Inhalt:  jds-verify={{ verification.token }}</pre>
+    </div>
+    {% endif %}
+
+    <div class="card" style="margin-bottom:12px;">
+        <div class="card-h">Schritt 3: Verifikation prüfen</div>
+        <p style="font-size:14px;color:var(--fg2);margin-bottom:12px;">Nachdem du den Record/Tag gesetzt hast, klicke auf Prüfen:</p>
+        <a href="{% url 'verify_check' verification.pk %}" class="btn btn-p">Jetzt prüfen</a>
+    </div>
+
+    <p style="font-size:12px;color:var(--fg3);">DNS-Änderungen können bis zu 48 Stunden dauern. In der Regel sind es 5-15 Minuten.</p>
+</div>
+{% endblock %}

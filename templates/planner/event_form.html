@@ -1,0 +1,18 @@
+{% extends "base.html" %}{% block title %}Neuer Termin – JDS Planer{% endblock %}{% block content %}
+<div class="ios-form-page">
+    <h2>Neuer Termin</h2>
+    <div class="ios-card"><form method="POST">{% csrf_token %}
+        <div class="ios-input-group"><label>Titel</label><input type="text" name="title" class="ios-input" placeholder="Termin-Titel" required></div>
+        <div class="ios-form-row">
+            <div class="ios-input-group ios-flex-1"><label>Start</label><input type="datetime-local" name="start_time" class="ios-input" required></div>
+            <div class="ios-input-group ios-flex-1"><label>Ende</label><input type="datetime-local" name="end_time" class="ios-input" required></div>
+        </div>
+        <div class="ios-input-group"><label>Ort</label><input type="text" name="location" class="ios-input" placeholder="Optional"></div>
+        <div class="ios-input-group"><label>Beschreibung</label><textarea name="description" class="ios-input" rows="3" placeholder="Details zum Termin"></textarea></div>
+        <div class="ios-form-row">
+            <div class="ios-input-group ios-flex-1"><label>Farbe</label><input type="color" name="color" value="#007aff" style="width:100%;height:40px;border:none;border-radius:var(--ios-radius-sm);cursor:pointer;"></div>
+            <div class="ios-input-group ios-flex-1" style="display:flex;align-items:flex-end;padding-bottom:14px;"><label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:14px;"><input type="checkbox" name="all_day"> Ganztagig</label></div>
+        </div>
+        <button type="submit" class="ios-submit" style="width:auto;padding:12px 32px;">Termin erstellen</button>
+    </form></div>
+</div>{% endblock %}

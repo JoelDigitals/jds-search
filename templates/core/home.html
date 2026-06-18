@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% block title %}Dashboard – JDS{% endblock %}
+{% block content %}
+<div class="jds-section">
+    <div style="text-align:center;margin-bottom:32px;">
+        <span style="font-size:36px;font-weight:800;background:linear-gradient(135deg,var(--jds-primary),var(--jds-accent));-webkit-background-clip:text;-webkit-text-fill-color:transparent;">JDS</span>
+        <h2 style="margin-top:8px;">{% if user.is_authenticated %}Hallo {{ user.username }}{% else %}Willkommen{% endif %}</h2>
+    </div>
+    <div class="jds-grid-3">
+        {% for app in apps %}
+        <a href="{{ app.url }}" class="jds-stat-card" style="text-decoration:none;">
+            <span style="font-size:32px;">{{ app.icon }}</span>
+            <div style="font-size:15px;font-weight:600;color:var(--jds-text);margin-top:8px;">{{ app.name }}</div>
+        </a>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,55 @@
+{% extends "base.html" %}{% block title %}Produkt einstellen – JDS Marketplace{% endblock %}{% block extra_head %}
+<script>
+const JDS_CLOUD_URL = "https://ppkinjwiewiynqgofdcz.supabase.co/functions/v1/upload";
+const JDS_CLOUD_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBwa2luandpZXdpeW5xZ29mZGN6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU4NDY2MTksImV4cCI6MjA5MTQyMjYxOX0.hSU2FfTONOrOZrbBOASoAXlx7W3ePg3tsHj-VaCg-Jo";
+
+async function uploadFile(input) {
+    var file = input.files[0];
+    if (!file) return;
+    var status = document.getElementById('uploadStatus');
+    var imgUrl = document.getElementById('id_image_url');
+    var preview = document.getElementById('imgPreview');
+    status.textContent = 'Lade hoch...';
+    status.style.color = 'var(--ios-blue)';
+
+    var fd = new FormData();
+    fd.append('file', file);
+    try {
+        var r = await fetch(JDS_CLOUD_URL, {method:'POST',headers:{'Authorization':'Bearer '+JDS_CLOUD_KEY},body:fd});
+        var d = await r.json();
+        if (d.success) {
+            imgUrl.value = d.file.view_url;
+            preview.innerHTML = '<div style="background:rgba(52,199,89,0.08);color:var(--ios-green);padding:10px;border-radius:10px;font-size:13px;">'+file.name+' ('+(d.file.size/1024).toFixed(1)+' KB) hochgeladen</div>';
+            status.textContent = 'Fertig';
+            status.style.color = 'var(--ios-green)';
+        } else {
+            status.textContent = 'Fehler beim Upload';
+            status.style.color = 'var(--ios-red)';
+        }
+    } catch(e) {
+        status.textContent = 'Netzwerkfehler';
+        status.style.color = 'var(--ios-red)';
+    }
+}
+</script>
+{% endblock %}{% block content %}
+<div class="ios-form-page"><h2>Produkt einstellen</h2>
+<div class="ios-card"><form method="POST">{% csrf_token %}
+    <div class="ios-input-group"><label>Produktname</label><input type="text" name="name" class="ios-input" placeholder="Name des Produkts" required></div>
+    <div class="ios-form-row"><div class="ios-input-group ios-flex-1"><label>Preis (&euro;)</label><input type="number" name="price" class="ios-input" step="0.01" min="0" placeholder="0,00" required></div>
+    <div class="ios-input-group ios-flex-1"><label>Kategorie</label><select name="category" class="ios-select"><option value="">Keine</option>{% for c in categories %}<option value="{{ c.id }}">{{ c.name }}</option>{% endfor %}</select></div></div>
+    <div class="ios-input-group"><label>Beschreibung</label><textarea name="description" class="ios-input" rows="4" placeholder="Beschreibe dein Produkt..."></textarea></div>
+    <div class="ios-input-group">
+        <label>Produktbild – JDS Cloud Upload</label>
+        <div style="border:2px dashed var(--ios-border);border-radius:var(--ios-radius);padding:20px;text-align:center;transition:border .2s;" ondrop="event.preventDefault();uploadFile({files:event.dataTransfer.files})" ondragover="event.preventDefault();this.style.borderColor='var(--ios-blue)'" ondragleave="this.style.borderColor='var(--ios-border)'">
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="var(--ios-text3)" stroke-width="1.5"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+            <p style="font-size:14px;color:var(--ios-text3);margin:8px 0;">Datei hierher ziehen oder auswahlen</p>
+            <input type="file" onchange="uploadFile(this)" style="display:none;" id="fileInput">
+            <button type="button" class="ios-btn ios-btn-sm" onclick="document.getElementById('fileInput').click()">Datei auswahlen</button>
+            <span id="uploadStatus" style="display:block;margin-top:8px;font-size:13px;"></span>
+            <div id="imgPreview"></div>
+        </div>
+        <input type="hidden" name="image_url" id="id_image_url">
+    </div>
+    <button type="submit" class="ios-submit" style="width:auto;padding:12px 32px;">Produkt einstellen</button>
+</form></div></div>{% endblock %}

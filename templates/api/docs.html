@@ -1,0 +1,44 @@
+{% extends "base.html" %}{% block title %}JDS API{% endblock %}{% block content %}
+<div class="ios-section" style="max-width:800px;">
+    <h2>JDS REST API</h2>
+    <p style="color:var(--ios-text2);margin-bottom:24px;">API-Keys unter <a href="{% url 'developer' %}">Developer Settings</a> verwalten.</p>
+
+    <div class="ios-card" style="margin-bottom:16px;"><div class="ios-card-h">Authentication</div><p style="font-size:14px;color:var(--ios-text2);">Header: <code style="background:var(--ios-bg);padding:2px 6px;border-radius:4px;">Authorization: Bearer jds_YOUR_KEY</code></p></div>
+
+    {% for ep in endpoints %}<div class="ios-card" style="margin-bottom:10px;display:flex;align-items:flex-start;gap:14px;">
+        <span style="background:{% if ep.method == 'GET' %}var(--ios-green){% else %}var(--ios-blue){% endif %};color:#fff;padding:3px 10px;border-radius:4px;font-size:11px;font-weight:700;min-width:48px;text-align:center;">{{ ep.method }}</span>
+        <div><code style="font-size:14px;font-weight:600;">{{ ep.path }}</code><p style="font-size:13px;color:var(--ios-text2);margin-top:2px;">{{ ep.desc }}</p></div>
+    </div>{% endfor %}
+
+    <div class="ios-card" style="margin-top:20px;"><div class="ios-card-h">JDS Cloud – Datei-Upload</div>
+        <p style="font-size:14px;color:var(--ios-text2);margin-bottom:12px;">Lade Dateien per API hoch – kompatibel mit curl, Python, JavaScript.</p>
+        <div style="background:var(--ios-bg);padding:16px;border-radius:8px;margin-bottom:12px;">
+            <div style="font-size:13px;font-weight:600;margin-bottom:4px;">Endpoint</div>
+            <code style="font-size:13px;word-break:break-all;">POST https://ppkinjwiewiynqgofdcz.supabase.co/functions/v1/upload</code>
+        </div>
+        <p style="font-size:13px;font-weight:600;margin-bottom:8px;">curl</p>
+        <pre style="background:var(--ios-bg);padding:14px;border-radius:8px;font-size:12px;overflow-x:auto;line-height:1.5;">curl -X POST \
+  "https://ppkinjwiewiynqgofdcz.supabase.co/functions/v1/upload" \
+  -H "Authorization: Bearer YOUR_JDS_KEY" \
+  -F "file=@./meine-datei.pdf"</pre>
+        <p style="font-size:13px;font-weight:600;margin:12px 0 8px;">Python</p>
+        <pre style="background:var(--ios-bg);padding:14px;border-radius:8px;font-size:12px;overflow-x:auto;line-height:1.5;">import requests
+r = requests.post(
+    "https://ppkinjwiewiynqgofdcz.supabase.co/functions/v1/upload",
+    headers={"Authorization": "Bearer YOUR_JDS_KEY"},
+    files={"file": open("datei.pdf", "rb")}
+)
+data = r.json()
+print(data["file"]["view_url"])</pre>
+        <p style="font-size:13px;font-weight:600;margin:12px 0 8px;">Antwort</p>
+        <pre style="background:var(--ios-bg);padding:14px;border-radius:8px;font-size:12px;overflow-x:auto;line-height:1.5;">{
+  "success": true,
+  "file": {
+    "name": "datei.pdf",
+    "size": 1234567,
+    "view_url": "https://.../file-access?token=...",
+    "download_url": "https://.../file-access?token=..."
+  }
+}</pre>
+    </div>
+</div>{% endblock %}

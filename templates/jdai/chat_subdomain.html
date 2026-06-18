@@ -1,0 +1,29 @@
+{% extends "base.html" %}{% block title %}JDAI – KI-Assistent{% endblock %}{% block content %}
+<div class="ios-chat-wrap">
+    {% if user.is_authenticated %}<div class="ios-chat-side">
+        <div style="font-size:15px;font-weight:600;color:var(--ios-blue);margin-bottom:8px;">JDAI</div>
+        <a href="{% url 'jdai_new' %}" class="ios-btn ios-btn-blue" style="text-align:center;width:100%;">+ Neuer Chat</a>
+        <div style="overflow-y:auto;flex:1;margin-top:8px;">{% for chat in sessions %}
+            <a href="?session_id={{ chat.id }}" style="display:flex;justify-content:space-between;align-items:center;padding:10px 12px;border-radius:var(--ios-radius-sm);font-size:14px;color:var(--ios-text);text-decoration:none;{% if active_session.id == chat.id %}background:rgba(0,122,255,0.08);color:var(--ios-blue);{% endif %}margin-bottom:2px;">
+                <span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1;">{{ chat.title }}</span>
+                <a href="{% url 'jdai_delete' chat.id %}" style="color:var(--ios-red);font-size:16px;padding:0 4px;" onclick="event.stopPropagation();return confirm('Loschen?')">&times;</a>
+            </a>{% empty %}<div style="text-align:center;padding:20px;font-size:13px;color:var(--ios-text3);">Keine Chats</div>{% endfor %}</div>
+    </div>{% endif %}
+    <div class="ios-chat-main">
+        {% if active_session %}<div style="padding:14px 20px;border-bottom:1px solid var(--ios-border);font-size:15px;font-weight:600;">{{ active_session.title }}</div>
+            <div class="ios-chat-msgs" id="cm">{% for msg in active_session.messages.all %}<div class="ios-msg {{ msg.role|slice:':1'|lower }}"><div class="ios-msg-av">{{ msg.role|slice:':1' }}</div><div class="ios-msg-b">{{ msg.content|linebreaksbr }}</div></div>{% endfor %}</div>
+            <div style="padding:14px 20px;display:flex;gap:8px;border-top:1px solid var(--ios-border);"><form style="display:flex;gap:8px;width:100%;" onsubmit="sm(event,{{ active_session.id }})">{% csrf_token %}<input type="text" id="mi" class="ios-input" placeholder="Nachricht..." autofocus style="border-radius:var(--ios-radius-pill);"><button class="ios-btn ios-btn-blue" style="border-radius:50%;width:38px;height:38px;padding:0;flex-shrink:0;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="19" x2="12" y2="5"/><polyline points="5 12 12 5 19 12"/></svg></button></form></div>
+        {% else %}<div style="text-align:center;padding:60px 20px;max-width:440px;margin:auto;">
+            <div style="width:80px;height:80px;background:linear-gradient(135deg,var(--ios-blue),var(--ios-purple));border-radius:24px;display:flex;align-items:center;justify-content:center;margin:0 auto 16px;"><span style="color:#fff;font-size:36px;font-weight:700;">AI</span></div>
+            <h2 style="font-size:20px;font-weight:700;margin-bottom:4px;">JDAI</h2><p style="color:var(--ios-text3);margin-bottom:20px;">Dein personlicher KI-Assistent</p>
+            {% if user.is_authenticated %}<a href="{% url 'jdai_new' %}" class="ios-btn ios-btn-blue ios-btn-lg">Chat starten</a>{% endif %}
+            <div style="margin-top:24px;text-align:left;" id="anonChat"><div id="am" style="min-height:30px;display:flex;flex-direction:column;gap:6px;margin-bottom:10px;"></div>
+            <div style="display:flex;gap:8px;"><input type="text" id="ai" class="ios-input" placeholder="Frag JDAI..." style="border-radius:var(--ios-radius-pill);"><button class="ios-btn ios-btn-blue" onclick="sa()" style="border-radius:50%;width:38px;height:38px;padding:0;flex-shrink:0;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="19" x2="12" y2="5"/><polyline points="5 12 12 5 19 12"/></svg></button></div></div>
+        </div>{% endif %}
+    </div>
+</div>
+<script>function sm(e,sid){e.preventDefault();var i=document.getElementById('mi'),m=i.value.trim();if(!m)return;var c=document.getElementById('cm');c.innerHTML+='<div class="ios-msg user"><div class="ios-msg-av">U</div><div class="ios-msg-b">'+esc(m)+'</div></div><div class="ios-msg assistant"><div class="ios-msg-av">J</div><div class="ios-msg-b">...</div></div>';c.scrollTop=c.scrollHeight;i.value='';var f=new FormData();f.append('message',m);f.append('csrfmiddlewaretoken','{{ csrf_token }}');fetch('/jdai/send/'+sid+'/',{method:'POST',body:f}).then(function(r){return r.json()}).then(function(d){var ms=c.querySelectorAll('.ios-msg.assistant'),l=ms[ms.length-1];l.querySelector('.ios-msg-b').innerHTML=fmt(d.messages[d.messages.length-1].content);c.scrollTop=c.scrollHeight})}
+function sa(){var i=document.getElementById('ai'),m=i.value.trim();if(!m)return;var c=document.getElementById('am');c.innerHTML+='<div class="ios-msg user"><div class="ios-msg-av">U</div><div class="ios-msg-b">'+esc(m)+'</div></div><div class="ios-msg assistant"><div class="ios-msg-av">J</div><div class="ios-msg-b">...</div></div>';i.value='';var f=new FormData();f.append('message',m);f.append('csrfmiddlewaretoken','{{ csrf_token }}');fetch('/jdai/send-anonymous/',{method:'POST',body:f}).then(function(r){return r.json()}).then(function(d){var ms=c.querySelectorAll('.ios-msg.assistant'),l=ms[ms.length-1];l.querySelector('.ios-msg-b').innerHTML=fmt(d.messages[d.messages.length-1].content)})}
+function esc(t){var d=document.createElement('div');d.textContent=t;return d.innerHTML}
+function fmt(t){return t.replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>').replace(/\n/g,'<br>')}</script>
+{% endblock %}

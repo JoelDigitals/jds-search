@@ -1,0 +1,34 @@
+{% extends "base.html" %}{% block title %}Domain-Verifikation – JDS{% endblock %}
+{% block content %}
+<div class="section" style="max-width:700px;">
+    <h2>Domain verifizieren</h2>
+    <p style="color:var(--fg2);margin-bottom:20px;">Bestätige, dass dir die Domain gehört, bevor sie indexiert wird.</p>
+
+    <div class="card" style="margin-bottom:20px;">
+        <div class="card-h">Schritt 1: Domain anmelden</div>
+        <form method="POST">{% csrf_token %}
+            <div class="fgroup"><label>Domain (z.B. meinefirma.de)</label><input type="text" name="domain" class="input" placeholder="meine-domain.de" required></div>
+            <div class="fgroup"><label>Verifikationsmethode</label>
+                <select name="method" class="input">
+                    <option value="dns">DNS TXT Record (empfohlen)</option>
+                    <option value="meta">Meta-Tag</option>
+                    <option value="file">HTML-Datei</option>
+                </select>
+            </div>
+            <button type="submit" class="btn btn-p">Domain anmelden</button>
+        </form>
+    </div>
+
+    {% if verifications %}
+    <div class="card-h" style="margin-top:24px;">Deine Domains</div>
+    {% for v in verifications %}
+    <div class="card" style="margin-bottom:8px;display:flex;justify-content:space-between;align-items:center;">
+        <div>
+            <strong>{{ v.domain }}</strong>
+            <span style="font-size:12px;margin-left:8px;color:{% if v.status == 'verified' %}var(--green){% else %}var(--orange){% endif %};">{% if v.status == 'verified' %}✓ Verifiziert{% else %}⏳ Ausstehend{% endif %}</span>
+        </div>
+        <a href="{% url 'verify_check' v.pk %}" class="btn btn-p btn-sm">Prüfen</a>
+    </div>
+    {% endfor %}{% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,23 @@
+{% extends "base.html" %}{% block title %}Suchindex – JDS{% endblock %}{% block content %}
+<div class="ios-section" style="max-width:900px;">
+    <h2>Suchindex <span style="font-size:15px;color:var(--ios-text3);font-weight:400;">&middot; {{ total }} Seiten</span></h2>
+    <div class="ios-steps"><div class="ios-step active"><div class="ios-step-num">1</div>Seite indexieren</div></div>
+    <div class="ios-card" style="margin-bottom:20px;">
+        <form method="POST">{% csrf_token %}
+        <div class="ios-form-row"><div class="ios-input-group ios-flex-2"><label>URL</label><input type="url" name="url" class="ios-input" placeholder="https://beispiel.de" required></div>
+        <div class="ios-input-group ios-flex-1"><label>Kategorie</label><select name="category" class="ios-select"><option>Web</option><option>Wissen</option><option>Entwicklung</option><option>Nachrichten</option><option>Technologie</option><option>Shopping</option><option>Regierung</option><option>Bildung</option><option>Gesundheit</option><option>Finanzen</option><option>Tourismus</option><option>Automobil</option><option>Entertainment</option><option>Deutschland</option></select></div></div>
+        <div class="ios-input-group"><label>Titel</label><input type="text" name="title" class="ios-input" placeholder="Seitentitel" required></div>
+        <div class="ios-input-group"><label>Beschreibung</label><textarea name="description" class="ios-input" rows="2" placeholder="Kurzbeschreibung"></textarea></div>
+        <div class="ios-input-group"><label>Inhalt</label><textarea name="content" class="ios-input" rows="3" placeholder="Volltext der Seite"></textarea></div>
+        <button type="submit" class="ios-btn ios-btn-blue">Indexieren</button></form>
+    </div>
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;flex-wrap:wrap;gap:8px;">
+        <div style="display:flex;gap:4px;flex-wrap:wrap;">{% for c in categories %}<a href="?cat={{ c.category }}{% if q %}&q={{ q }}{% endif %}" class="ios-tag {% if cat == c.category %}active{% endif %}">{{ c.category }} ({{ c.n }})</a>{% endfor %}{% if cat %}<a href="?" class="ios-tag" style="color:var(--ios-red);">Filter loschen</a>{% endif %}</div>
+        <form method="GET" style="display:flex;gap:6px;"><input type="text" name="q" value="{{ q }}" class="ios-input" placeholder="Suchen..." style="width:180px;padding:9px 14px;font-size:13px;"><button type="submit" class="ios-btn ios-btn-blue ios-btn-sm">Suchen</button></form>
+    </div>
+    <div class="ios-card" style="padding:0;">
+        <table class="ios-table"><thead><tr><th>Titel</th><th>Domain</th><th>Kategorie</th><th>Verif.</th><th>Datum</th><th></th></tr></thead>
+        <tbody>{% for p in pages %}<tr><td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">{{ p.title }}</td><td style="font-size:12px;color:var(--ios-text3);">{{ p.domain|truncatechars:22 }}</td><td><span class="ios-badge">{{ p.category }}</span></td><td>{% if p.is_verified %}<span style="color:var(--ios-green);font-weight:600;">Ja</span>{% else %}<span style="color:var(--ios-text3);">–</span>{% endif %}</td><td style="font-size:12px;color:var(--ios-text3);">{{ p.indexed_at|date:"d.m.y" }}</td><td><a href="{% url 'search_delete' p.pk %}" class="ios-btn ios-btn-red ios-btn-sm" onclick="return confirm('Loschen?')">Loschen</a></td></tr>{% empty %}<tr><td colspan="6" class="ios-empty">Keine Seiten gefunden.</td></tr>{% endfor %}</tbody></table>
+    </div>
+    <div class="ios-pages">{% if page > 1 %}<a href="?page={{ page|add:-1 }}{% if cat %}&cat={{ cat }}{% endif %}{% if q %}&q={{ q }}{% endif %}" class="ios-page"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg></a>{% endif %}<span class="ios-page current">{{ page }}</span>{% if has_next %}<a href="?page={{ page|add:1 }}{% if cat %}&cat={{ cat }}{% endif %}{% if q %}&q={{ q }}{% endif %}" class="ios-page"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg></a>{% endif %}</div>
+</div>{% endblock %}

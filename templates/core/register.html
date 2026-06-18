@@ -1,0 +1,16 @@
+{% extends "base.html" %}{% block title %}Registrieren – JDS{% endblock %}{% block content %}<div class="ios-auth-center"><div class="ios-auth-card"><h1><span>J</span>DS</h1><h2>Konto erstellen</h2>
+{% if errors %}<div style="background:rgba(255,59,48,0.08);color:var(--ios-red);padding:10px;border-radius:10px;margin-bottom:12px;font-size:13px;">{% for e in errors %}&bull; {{ e }}<br>{% endfor %}</div>{% endif %}
+<form method="POST">{% csrf_token %}
+<div class="ios-input-group"><label>Benutzername</label><input type="text" name="username" class="ios-input" value="{{ username|default:'' }}" placeholder="Mindestens 3 Zeichen" required autofocus></div>
+<div class="ios-input-group"><label>Deine JDS E-Mail-Adresse</label>
+    <div style="display:flex;align-items:center;gap:0;border:1px solid var(--ios-border);border-radius:var(--ios-radius-sm);overflow:hidden;transition:all .2s;background:var(--ios-bg);">
+        <input type="text" name="email_local" class="ios-input" value="{{ email_local|default:username|default:'' }}" placeholder="dein.name" style="border:none;flex:1;border-radius:0;" oninput="document.getElementById('preview').textContent=this.value||'dein.name'">
+        <span style="padding:0 14px;color:var(--ios-text3);font-size:15px;font-weight:500;background:var(--ios-bg);border-left:1px solid var(--ios-border);white-space:nowrap;line-height:44px;">@jds-search.de</span>
+    </div>
+    <p style="font-size:12px;color:var(--ios-text3);margin-top:4px;">Deine Adresse: <strong id="preview" style="color:var(--ios-blue);">{{ email_local|default:username|default:'dein.name' }}</strong>@jds-search.de</p>
+</div>
+<div class="ios-input-group"><label>Passwort</label><input type="password" name="password1" class="ios-input" placeholder="Mindestens 5 Zeichen" required></div>
+<div class="ios-input-group"><label>Passwort bestatigen</label><input type="password" name="password2" class="ios-input" placeholder="Passwort wiederholen" required></div>
+<button type="submit" class="ios-submit">JDS-Konto erstellen</button></form>
+<div style="margin-top:18px;font-size:14px;"><a href="{% url 'login' %}">Bereits registriert? Anmelden</a></div>
+</div></div>{% endblock %}

@@ -1,0 +1,12 @@
+{% extends "base.html" %}{% block title %}JDS Mail{% endblock %}{% block content %}
+<div class="ios-mail-wrap">
+    <div class="ios-mail-side">
+        <div style="padding:0 12px 12px;font-size:15px;font-weight:600;color:var(--ios-blue);">JDS Mail</div>
+        <a href="{% url 'mail_compose' %}" class="ios-mail-compose"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Verfassen</a>
+        {% for fkey,fname in folders %}<a href="{% url 'mail_folder' fkey %}" class="ios-mail-folder {% if current_folder == fkey %}active{% endif %}">{{ fname }}{% if fkey == 'inbox' and unread_count > 0 %}<span class="ios-mail-folder-count">{{ unread_count }}</span>{% endif %}</a>{% endfor %}
+        <div style="margin-top:auto;padding:12px 14px;font-size:12px;color:var(--ios-text3);border-top:1px solid var(--ios-border);">{{ user.username }}@jds-search.de</div>
+    </div>
+    <div class="ios-mail-main">
+        {% for email in emails %}<a href="{% url 'mail_detail' email.pk %}" class="ios-mail-row {% if not email.is_read %}unread{% endif %}"><span class="ios-mail-from">{{ email.sender }}</span><span class="ios-mail-subj">{{ email.subject }}</span><span class="ios-mail-snip">{{ email.body|truncatechars:50 }}</span><span class="ios-mail-date">{{ email.created_at|date:"d.M" }}</span></a>{% empty %}<div class="ios-empty">{% if current_folder == 'inbox' %}Posteingang leer{% else %}Keine E-Mails{% endif %}</div>{% endfor %}
+    </div>
+</div>{% endblock %}

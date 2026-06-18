@@ -1,0 +1,22 @@
+{% extends "base.html" %}{% block title %}Ads Manager – JDS{% endblock %}{% block content %}
+<div class="ios-section" style="max-width:800px;">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;"><h2>Werbeanzeigen</h2>
+        <div style="display:flex;gap:10px;align-items:center;">
+            <span style="font-size:14px;color:var(--ios-text2);">Guthaben: <strong style="color:var(--ios-green);">{{ wallet.balance }} &euro;</strong></span>
+            <a href="{% url 'wallet_topup' %}" class="ios-btn ios-btn-sm">+ Aufladen</a>
+            <a href="{% url 'ads_create' %}" class="ios-btn ios-btn-blue">+ Neue Kampagne</a>
+        </div>
+    </div>
+
+    {% for c in campaigns %}<div class="ios-card" style="margin-bottom:10px;">
+        <div style="display:flex;justify-content:space-between;align-items:start;">
+            <div style="flex:1;"><div style="font-size:16px;font-weight:600;">{{ c.title }}</div><div style="color:var(--ios-text2);font-size:14px;margin:4px 0;">{{ c.description }}</div><a href="{{ c.target_url }}" target="_blank" style="font-size:12px;">{{ c.target_url }}</a></div>
+            <div style="text-align:right;flex-shrink:0;margin-left:16px;">
+                <span class="ios-badge" style="{% if c.is_active and c.remaining_budget > 0 %}background:rgba(52,199,89,0.1);color:var(--ios-green);{% else %}background:rgba(255,59,48,0.08);color:var(--ios-red);{% endif %}">{% if c.is_active and c.remaining_budget > 0 %}Aktiv{% else %}Pausiert{% endif %}</span>
+                <div style="font-size:12px;color:var(--ios-text3);margin-top:4px;">{{ c.clicks }} Klicks</div>
+                <div style="font-size:12px;color:var(--ios-text3);">Rest: {{ c.remaining_budget|floatformat:2 }} &euro;</div>
+            </div>
+        </div>
+        <div style="height:4px;background:var(--ios-bg);border-radius:2px;margin-top:10px;overflow:hidden;"><div style="height:100%;background:var(--ios-blue);border-radius:2px;width:{% widthratio c.clicks|add:1 c.budget|floatformat:'0'|add:1 c.cost_per_click|floatformat:'0' %}%;transition:width .3s;"></div></div>
+    </div>{% empty %}<div class="ios-empty"><p>Keine Kampagnen.</p><a href="{% url 'ads_create' %}" class="ios-btn ios-btn-blue" style="margin-top:12px;">Erste Kampagne erstellen</a></div>{% endfor %}
+</div>{% endblock %}

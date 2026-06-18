@@ -1,0 +1,34 @@
+{% extends "base.html" %}{% block title %}JDS Search{% endblock %}
+{% block content %}
+<div class="ios-landing">
+    <div class="ios-landing-logo"><span>J</span>DS</div>
+    <p class="ios-tagline">Suchen &middot; Finden &middot; Entdecken</p>
+    <div class="ios-search-wrap">
+        <form method="GET" action="{% url 'search_home' %}" id="sf">
+            <div class="ios-search-bar">
+                <svg class="ios-search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                <input type="text" name="q" class="ios-search-input" id="si" autofocus autocomplete="off" placeholder="JDS durchsuchen" oninput="ac()" onkeydown="if(event.key==='ArrowDown'){event.preventDefault();mv(1)}if(event.key==='ArrowUp'){event.preventDefault();mv(-1)}if(event.key==='Enter'&&si>=0){event.preventDefault();sel()}">
+                <span class="ios-search-mic" id="mic" onclick="voice()" title="Sprachsuche"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 1a3 3 0 00-3 3v8a3 3 0 006 0V4a3 3 0 00-3-3z"/><path d="M19 10v2a7 7 0 01-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg></span>
+                <button type="submit" class="ios-search-submit">Suchen</button>
+            </div>
+            <div class="ios-ac-drop" id="ac"></div>
+        </form>
+    </div>
+    <div class="ios-search-btns">
+        <a href="{% url 'jdai_home' %}" class="ios-btn">JDAI KI-Assistent</a>
+        <a href="{% url 'search_home' %}" class="ios-btn">Erweiterte Suche</a>
+    </div>
+    {% if user.is_authenticated %}<div style="margin-top:22px;display:flex;gap:8px;flex-wrap:wrap;justify-content:center;font-size:14px;">
+        <a href="{% url 'mail_home' %}" class="ios-btn ios-btn-sm">Mail</a>
+        <a href="{% url 'planner_home' %}" class="ios-btn ios-btn-sm">Planer</a>
+        <a href="{% url 'marketplace_home' %}" class="ios-btn ios-btn-sm">Marktplatz</a>
+        <a href="{% url 'maps_view' %}" class="ios-btn ios-btn-sm">Maps</a>
+        <a href="{% url 'notes_home' %}" class="ios-btn ios-btn-sm">Notizen</a>
+    </div>{% endif %}
+    <div class="ios-footer" style="position:absolute;bottom:0;left:0;right:0;">
+        <div><a href="{% url 'privacy' %}">Datenschutz</a><a href="{% url 'privacy' %}">DSGVO</a><a href="{% url 'privacy' %}">Impressum</a></div>
+        <div><a href="{% url 'dns_guide' %}">DNS Setup</a><a href="/api/">API Docs</a></div>
+    </div>
+</div>
+<script>let si=-1,s=[];function ac(){const q=document.getElementById('si').value.trim();if(q.length<2){document.getElementById('ac').style.display='none';si=-1;return}fetch('/search/autocomplete/?q='+encodeURIComponent(q)).then(r=>r.json()).then(d=>{s=d.suggestions;if(!s.length){document.getElementById('ac').style.display='none';return}document.getElementById('ac').innerHTML=s.map((x,i)=>'<div class="ios-ac-item'+(i===si?'" style="background:rgba(0,122,255,0.06)"':'')+'" onmousedown="go('+i+')">'+e(x)+'</div>').join('');document.getElementById('ac').style.display='block'})}function mv(d){if(!s.length)return;si=Math.min(Math.max(si+d,0),s.length-1);document.getElementById('ac').querySelectorAll('.ios-ac-item').forEach((x,i)=>{x.style.background=i===si?'rgba(0,122,255,0.06)':''});if(si>=0)document.getElementById('si').value=s[si]}function go(i){document.getElementById('si').value=s[i];document.getElementById('ac').style.display='none';document.getElementById('sf').submit()}function sel(){if(si>=0)go(si)}function voice(){const R=window.SpeechRecognition||window.webkitSpeechRecognition;if(!R){alert('Spracherkennung nicht unterstützt');return}const r=new R();r.lang='de-DE';const m=document.getElementById('mic');m.classList.add('listening');r.start();r.onresult=e=>{document.getElementById('si').value=e.results[0][0].transcript;m.classList.remove('listening');document.getElementById('sf').submit()};r.onerror=r.onend=()=>m.classList.remove('listening')}function e(t){const d=document.createElement('div');d.textContent=t;return d.innerHTML}document.addEventListener('click',ev=>{if(!ev.target.closest('.ios-search-wrap')){document.getElementById('ac').style.display='none';si=-1}})</script>
+{% endblock %}
